@@ -3,7 +3,7 @@
 @section('content')
     <div class="row mb-3">
         <div class="col">
-            <h1>User Management System</h1>
+            <h1>User List's</h1>
         </div>
         <div class="col text-end">
             <button class="btn btn-primary" id="addUserBtn">
@@ -32,11 +32,18 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
+                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm btn-info">
+                        <!-- view          -->
+                        <i class="bi bi-eye"></i>
+    </a>
+    
                             <button class="btn btn-sm btn-warning edit-btn" data-id="{{ $user->id }}">
-                                <i class="bi bi-pencil"></i> Edit
+                            <!-- Edit      -->
+                            <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn" data-id="{{ $user->id }}">
-                                <i class="bi bi-trash"></i> Delete
+                                <!-- Delete -->
+                                <i class="bi bi-trash"></i>
                             </button>
                         </td>
                     </tr>
@@ -44,50 +51,66 @@
             </tbody>
         </table>
     </div>
-
-    {{ $users->links() }}
+    
+    <!-- Generates pagination links for users if needed.and remembers the search term when moving on next page -->
+    {{ $users->withQueryString()->links() }}
+    <!-- {{ $users->links() }}  -->
 @endsection
 
 @section('scripts')
 <script>
+    // previously It was opening the Modal Form to add a User But I was told to create a Separate Route to Achieve this
+    // Functionality So I have Created The Route 8000/user/create
     $(document).ready(function() {
-        // Show add user modal
-        $('#addUserBtn').click(function() {
-            $('#userForm')[0].reset();
-            $('#user_id').val('');
-            $('#userModalLabel').text('Add New User');
-            $('#userModal').modal('show');
-        });
+    //     // Show add user modal
+    //     $('#addUserBtn').click(function() {
+    //         $('#userForm')[0].reset();
+    //         $('#user_id').val('');
+    //         $('#userModalLabel').text('Add New User');
+    //         $('#userModal').modal('show');
+    //     });
+     
+    // Here is The Functionality To achive This as mentioned Above
+    $('#addUserBtn').click(function() {
+    window.location.href = '/users/create';
+});
 
+        
         // Save user (add/edit)
         $('#saveBtn').click(function() {
     var userId = $('#user_id').val();
     var url = userId ? '/users/' + userId : '/users';
     var method = userId ? 'PUT' : 'POST';
 
+    // Clear previous errors
+    $('#userForm input').removeClass('is-invalid');
+    $('.invalid-feedback').text('');
+
     $.ajax({
         url: url,
         type: method,
         data: $('#userForm').serialize(),
         success: function(response) {
-            if (response.status == 200) {
-                $('#userModal').modal('hide');
-                showAlert('success', response.message);
-                // Reload the page to see changes
+            $('#userModal').modal('hide');
+            
+            // Show success message
+            toastr.success(response.message);
+            
+            // Reload the page to see changes
+            setTimeout(function() {
                 location.reload();
-            }
+            }, 1000);
         },
         error: function(xhr) {
-            var errors = xhr.responseJSON.errors;
-            // Clear previous errors
-            $('#userForm input').removeClass('is-invalid');
-            $('#userForm .invalid-feedback').text('');
-            
-            // Display new errors
-            $.each(errors, function(key, value) {
-                $('#' + key).addClass('is-invalid');
-                $('#' + key + '_error').text(value[0]);
-            });
+            if (xhr.status === 422) { // Validation error
+                var errors = xhr.responseJSON.errors;
+                $.each(errors, function(key, value) {
+                    $('#' + key).addClass('is-invalid');
+                    $('#' + key + '_error').text(value[0]);
+                });
+            } else {
+                toastr.error('An error occurred. Please try again.');
+            }
         }
     });
 });
