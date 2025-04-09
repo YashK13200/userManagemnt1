@@ -19,13 +19,20 @@ class UserController extends Controller
     // Updating index method logic for search feature implemenataion 5/4/2025
     public function index(Request $request)
     {
-        $search = $request->input('search');
-    
-        $users = User::latest()->when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%');
-        })->simplePaginate(5);
-    
-        return view('users.index', compact('users', 'search'));
+        $users = User::all(); // Fetch all users
+    return view('users.index', compact('users'));
+
+        // $search = $request->input('search');
+
+        // $users = User::query()
+        //             ->when($search, function ($query, $search) {
+        //                 $query->where('name', 'like', '%' . $search . '%');
+        //             })
+        //             ->orderBy('created_at', 'desc')
+        //             ->paginate(15)
+        //             ->withQueryString();
+                    
+        // return view('users.index', compact('users', 'search'));
     }
     
 
@@ -46,10 +53,8 @@ class UserController extends Controller
     ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $validator->errors()
-            ],422);
+            return redirect()->route('users.create')
+    ->with('error', 'User creatation failed.');
         }
 
         $user = User::create([
@@ -118,33 +123,22 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-            'password' => 'nullable|string|min:5|confirmed',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:5|confirmed'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $validator->errors()
-            ],422);
-        }
-
+    
         $user->name = $request->name;
         $user->email = $request->email;
-        
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
+    
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
         }
-
+    
         $user->save();
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'User updated successfully',
-            'user' => $user
-        ]);
+    
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)

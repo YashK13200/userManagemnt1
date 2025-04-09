@@ -18,7 +18,7 @@
     @endif
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table id = "tasksTable" class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
@@ -59,4 +59,24 @@
 
     {{ $tasks->links() }}
 </div>
+@endsection
+
+@section('scripts')
+<script>
+
+$(document).ready(function () {
+    $('#tasksTable').DataTable({
+        responsive: true,
+        language: {
+            searchPlaceholder: "Search users...",
+            search: "", // clears "Search:" label
+        },
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50, 100],
+        columnDefs: [
+            { orderable: false, targets: -1 } // make the "Actions" column unsortable
+        ]
+    });
+});
+</script>
 @endsection

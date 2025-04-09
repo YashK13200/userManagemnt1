@@ -16,7 +16,8 @@
     <div class="alert alert-danger d-none" id="errorAlert"></div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <!-- <table class="table table-striped table-hover"> -->
+            <table id="usersTable" class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
@@ -39,7 +40,10 @@
     
                             <button class="btn btn-sm btn-warning edit-btn" data-id="{{ $user->id }}">
                             <!-- Edit      -->
-                            <i class="bi bi-pencil"></i>
+                            <a href="{{ route('users.edit', $user->id) }}" >
+    <i class="bi bi-pencil"></i>
+</a>
+
                             </button>
                             <button class="btn btn-sm btn-danger delete-btn" data-id="{{ $user->id }}">
                                 <!-- Delete -->
@@ -53,8 +57,6 @@
     </div>
     
     <!-- Generates pagination links for users if needed.and remembers the search term when moving on next page -->
-    {{ $users->withQueryString()->links() }}
-    <!-- {{ $users->links() }}  -->
 @endsection
 
 @section('scripts')
@@ -74,6 +76,20 @@
     $('#addUserBtn').click(function() {
     window.location.href = '/users/create';
 });
+
+// DataTables Bootstrtap 5 JS ie Initializing DataTable 07/04/25
+$('#usersTable').DataTable({
+        responsive: true,
+        language: {
+            searchPlaceholder: "Search users...",
+            search: "", // clears "Search:" label
+        },
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50, 100],
+        columnDefs: [
+            { orderable: false, targets: -1 } // make the "Actions" column unsortable
+        ]
+    });
 
         
         // Save user (add/edit)

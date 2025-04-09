@@ -32,3 +32,9 @@ Route::delete('/projects/{project}/remove-user/{user}', [ProjectController::clas
 // Task status update
 Route::put('/tasks/{task}/update-status', [TaskController::class, 'updateStatus'])
     ->name('tasks.update-status');    
+
+// Show Edit Form
+Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+// Handle Edit Submission
+Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
