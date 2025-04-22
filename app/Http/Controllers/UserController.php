@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Project; 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -43,37 +44,39 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:5|confirmed',
-        ],
-    [
-        'name.required' => 'The Name Field is manadatory'
+            // Validate incoming request
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6',
     ]);
 
-        if ($validator->fails()) {
-            return redirect()->route('users.create')
-    ->with('error', 'User creatation failed.');
-        }
-
+    DB::beginTransaction();
+    info("User creation started");
+    try {
+        // Create the user
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
         ]);
-           
-    // Redirect to users index page with success message
-    return redirect()->route('users.index')
-    ->with('success', 'User created successfully.');
 
-    // Previously we were doing this after succssful craetion of user but now I am redirecting it to homepage instead of 
-    // sending json succsss response msg
-        // return response()->json([
-        //     'status' => 200,
-        //     'message' => 'User created successfully',
-        //     'user' => $user
-        // ]);
+        // Log it (This shows in terminal if you run `php artisan serve`)
+        info("User created successfully: ID {$user->id}");
+
+        // Commit the transaction
+        DB::commit();
+
+        return redirect()->route('users.index')->with('success', 'User created successfully!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        // Log error to terminal
+        info("Transaction rolled back due to error: " . $e->getMessage());
+
+        return back()->withErrors(['error' => 'Something went wrong.']);
+    }
+
     }
 
     // public function show(User $user)
@@ -118,6 +121,11 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        /*Added today Role Field*/
+        // if (!auth()->user()->hasRole('Admin')) {
+        //     abort(403);
+        // }
+        
         return view('users.edit', compact('user'));
     }
 

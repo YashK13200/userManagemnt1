@@ -20,24 +20,23 @@
             <table id="usersTable" class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Actions</th>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Email</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($users as $user)
                     <tr id="user_{{ $user->id }}">
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>
+                        <td class="text-center align-middle">{{ $user->id }}</td>
+                        <td class="text-center align-middle">{{ $user->name }}</td>
+                        <td class="text-center align-middle">{{ $user->email }}</td>
+                        <td class="text-center align-middle">
                         <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm btn-info">
                         <!-- view          -->
                         <i class="bi bi-eye"></i>
-    </a>
-    
+</a>
                             <button class="btn btn-sm btn-warning edit-btn" data-id="{{ $user->id }}">
                             <!-- Edit      -->
                             <a href="{{ route('users.edit', $user->id) }}" >

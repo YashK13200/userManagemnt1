@@ -21,20 +21,20 @@
         <table id = "tasksTable" class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Project</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Title</th>
+                    <th class="text-center">Project</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($tasks as $task)
                     <tr>
-                        <td>{{ $task->id }}</td>
-                        <td>{{ $task->title }}</td>
-                        <td>{{ $task->project->name }}</td>
-                        <td>
+                        <td class="text-center align-middle">{{ $task->id }}</td>
+                        <td class="text-center align-middle">{{ $task->title }}</td>
+                        <td class="text-center align-middle">{{ $task->project->name }}</td>
+                        <td class="text-center align-middle">
                             <span class="badge 
                                 @if($task->status == 'Pending') bg-secondary
                                 @elseif($task->status == 'In Progress') bg-warning text-dark
@@ -42,8 +42,8 @@
                                 @endif">
                                 {{ $task->status }}
                             </span>
-                        </td>
-                        <td>
+                        </td >
+                        <td class="text-center align-middle">
                             <a href="{{ route('tasks.show', $task->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i> 
                             </a>
@@ -68,7 +68,7 @@ $(document).ready(function () {
     $('#tasksTable').DataTable({
         responsive: true,
         language: {
-            searchPlaceholder: "Search users...",
+            searchPlaceholder: "Search tasks...",
             search: "", // clears "Search:" label
         },
         pageLength: 5,

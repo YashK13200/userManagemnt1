@@ -46,6 +46,17 @@
     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
     <div id="confirm-password-error" class="invalid-feedback">
     </div>
+    <!-- Adding Role Field Option  -->
+    <div class="form-group">
+    <label for="role">Role</label>
+    <select name="role" class="form-control" required>
+        <option value="">Select Role</option>
+        <option value="Admin">Admin</option>
+        <option value="User">User</option>
+    </select>
+</div>
+
+
         <button type="submit" class="btn btn-primary">Create User</button>
     </form>
 @endsection
